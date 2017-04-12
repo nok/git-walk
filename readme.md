@@ -5,17 +5,29 @@
 
 ## API
 
-`git walk first`:
-Checkout the latest commit.
+Checkout the latest commit:
 
-`git walk last`:
-Checkout the first commit.
+```
+git walk first
+```
 
-`git walk prev`:
-Walk down and checkout the previous commit.
+Checkout the first commit:
 
-`git walk next`
-Walk up and checkout the next commit.
+```
+git walk last
+```
+
+Walk down and checkout the previous commit:
+
+```
+git walk prev
+```
+
+Walk up and checkout the next commit:
+
+```
+git walk next
+```
 
 
 ## License
