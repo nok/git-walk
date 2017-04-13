@@ -8,13 +8,13 @@
 Checkout the latest commit:
 
 ```
-git walk first
+git walk last
 ```
 
 Checkout the first commit:
 
 ```
-git walk last
+git walk first
 ```
 
 Walk down and checkout the previous commit:
