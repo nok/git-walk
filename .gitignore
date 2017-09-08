@@ -2,7 +2,7 @@
 .idea
 
 __pycache__/
-*.py[cod]
+*.py[cod]g
 *$py.class
 
 .test_env
