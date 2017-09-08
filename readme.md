@@ -8,33 +8,25 @@ Walk up and down in revisions of a [Git](https://git-scm.com/) repository.
 Checkout the last or latest commit:
 
 ```bash
-git walk last
-```
-
-```bash
-git walk latest
+git walk (last|latest)
 ```
 
 Checkout the first or oldest commit:
 
 ```bash
-git walk first
-```
-
-```bash
-git walk oldest
+git walk (first|oldest)
 ```
 
 Walk down and checkout the previous commit:
 
 ```bash
-git walk prev
+git walk prev [n_commits]
 ```
 
 Walk up and checkout the next commit:
 
 ```bash
-git walk next
+git walk next [n_commits]
 ```
 
 

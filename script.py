@@ -1,53 +1,73 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import sys
 import subprocess as subp
 
 
-cmd = '' if len(sys.argv) <= 1 else str(sys.argv[1])
-steps = 1 if len(sys.argv) <= 2 else int(sys.argv[2])
-
-if steps == 0:
-    steps = 1
-
-if cmd in ['first', 'latest', 'prev', 'next']:
-
-    log = subp.check_output(['git', 'rev-list', '--all']).strip()
+def read_commit_ids():
+    cmd = 'git rev-list --all'
+    log = subp.check_output(cmd.split()).strip()
     log = [line.strip() for line in log.split('\n')]
+    return log
 
-    pos = subp.check_output(['git', 'rev-parse', 'HEAD']).strip()
-    idx = log.index(pos)
+
+def read_active_commit_id():
+    cmd = 'git rev-parse HEAD'
+    id = subp.check_output(cmd.split()).strip()
+    return id
+
+
+n_args = len(sys.argv) - 1
+cmd = str(sys.argv[1]) if n_args >= 1 else ''
+
+if cmd in ['first', 'oldest', 'last',
+           'latest', 'prev', 'next']:
+
+    log = read_commit_ids()
+    target_id = None
 
     # First commit:
-    if cmd == 'first':
-        subp.call(['git', 'checkout', log[-1]])
+    if cmd in ['first', 'oldest']:
+        target_id = log[-1]
 
     # Latest commit:
-    elif cmd == 'latest':
-        subp.call(['git', 'checkout', log[0]])
+    elif cmd in ['latest', 'newest']:
+        target_id = log[0]
 
-    # Next commit:
-    elif cmd == 'next':
-        if idx - steps >= 0:
-            subp.call(['git', 'checkout', log[idx - steps]])
-        else:
-            subp.call(['git', 'checkout', log[0]])
-            print("Now you're on the latest commit.")
+    # Either next or prev commit:
+    else:
+        try:
+            steps = int(sys.argv[2]) if n_args >= 2 else 1
+            if steps < 1:
+                steps = 1
+        except ValueError:
+            steps = 1
 
-    # Previous commit:
-    elif cmd == 'prev':
-        if idx + steps <= len(log) - 1:
-            if steps == 1:
-                subp.call(['git', 'checkout', 'HEAD^'])
-            else:
-                subp.call(['git', 'checkout', log[idx + steps]])
-        else:
-            subp.call(['git', 'checkout', log[-1]])
-            print("Now you're on the first commit.")
+        current_commit_id = read_active_commit_id()
+        current_index = log.index(current_commit_id)
+
+        # Next commit:
+        if cmd == 'next':
+            try:
+                target_id = log[current_index - steps - 1]
+            except IndexError:
+                target_id = log[0]
+
+        # Previous commit:
+        elif cmd == 'prev':
+            try:
+                target_id = log[current_index + steps]
+            except IndexError:
+                target_id = log[-1]
+
+    if target_id:
+        checkout_cmd = 'git checkout {} --quiet'.format(target_id)
+        subp.call(checkout_cmd.split())
 
 else:
     print('Usage:')
-    print('git walk latest')
-    print('git walk first')
-    print('git walk prev [int:n_commits]')
-    print('git walk next [int:n_commits]')
+    print('git walk (last|latest)')
+    print('git walk (first|oldest)')
+    print('git walk prev [n_commits]')
+    print('git walk next [n_commits]')
