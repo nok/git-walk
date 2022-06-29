@@ -7,14 +7,14 @@ import subprocess as subp
 
 def read_commit_ids():
     cmd = 'git rev-list --all'
-    log = subp.check_output(cmd.split()).strip()
-    log = [line.strip() for line in log.split('\n')]
+    log = subp.check_output(cmd.split()).strip().decode('utf-8')
+    log = [line.strip() for line in log.splitlines()]
     return log
 
 
 def read_active_commit_id():
     cmd = 'git rev-parse HEAD'
-    id = subp.check_output(cmd.split()).strip()
+    id = subp.check_output(cmd.split()).strip().decode('utf-8')
     return id
 
 
@@ -49,10 +49,14 @@ if cmd in ['first', 'oldest', 'last',
 
         # Next commit:
         if cmd == 'next':
-            try:
-                target_id = log[current_index - steps - 1]
-            except IndexError:
-                target_id = log[0]
+            if current_index > 0:
+                try:
+                    if current_index - steps >= 0:
+                        target_id = log[current_index - steps]
+                    else:
+                        target_id = log[0]
+                except IndexError:
+                    target_id = log[0]
 
         # Previous commit:
         elif cmd == 'prev':
